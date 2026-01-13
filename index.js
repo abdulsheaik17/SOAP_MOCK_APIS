@@ -20,10 +20,41 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'SOAP Mock Server is running' });
 });
 
-app.listen(PORT, () => {
-  console.log(`SOAP Mock Server running on http://localhost:${PORT}`);
-  console.log('\nAvailable SOAP Endpoints:');
-  console.log(`  POST http://localhost:${PORT}/api/no-auth (No Authentication)`);
-  console.log(`  POST http://localhost:${PORT}/api/basic-auth (Basic Auth: abc:1234)`);
-  console.log(`  POST http://localhost:${PORT}/api/x-api-key (X-API-Key: 1234)`);
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    message: 'SOAP Mock Server is running',
+    endpoints: {
+      health: '/health',
+      noAuth: 'POST /api/no-auth',
+      basicAuth: 'POST /api/basic-auth',
+      xApiKey: 'POST /api/x-api-key'
+    }
+  });
 });
+
+// Catch-all for undefined routes
+app.use((req, res) => {
+  res.status(404).json({ 
+    error: 'Not Found', 
+    path: req.path,
+    method: req.method,
+    message: 'The requested endpoint does not exist'
+  });
+});
+
+// Export for Vercel serverless function
+// Vercel will use this as the handler
+export default app;
+
+// Start server locally (only if not in Vercel environment)
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`SOAP Mock Server running on http://localhost:${PORT}`);
+    console.log('\nAvailable SOAP Endpoints:');
+    console.log(`  POST http://localhost:${PORT}/api/no-auth (No Authentication)`);
+    console.log(`  POST http://localhost:${PORT}/api/basic-auth (Basic Auth: abc:1234)`);
+    console.log(`  POST http://localhost:${PORT}/api/x-api-key (X-API-Key: 1234)`);
+  });
+}
