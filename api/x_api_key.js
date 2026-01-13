@@ -1,5 +1,6 @@
 import { soapEnvelope } from '../utils/soap.js';
 import { parseSoapRequest } from '../utils/soapParser.js';
+import { setCorsHeaders } from '../utils/cors.js';
 
 // Mock service details
 const services = {
@@ -39,6 +40,9 @@ const services = {
 };
 
 export default function handler(req, res) {
+  // Set CORS headers for all responses
+  setCorsHeaders(res);
+  
   const apiKey = req.headers["x-api-key"];
   
   if (apiKey !== "1234") {

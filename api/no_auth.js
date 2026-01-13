@@ -1,5 +1,6 @@
 import { soapEnvelope } from '../utils/soap.js';
 import { parseSoapRequest } from '../utils/soapParser.js';
+import { setCorsHeaders } from '../utils/cors.js';
 
 // Mock weather data
 const weatherData = {
@@ -76,6 +77,8 @@ export default function handler(req, res) {
     `;
   }
   
+  // Set CORS headers
+  setCorsHeaders(res);
   res.setHeader("Content-Type", "text/xml");
   res.status(200).send(soapEnvelope(responseBody));
 }

@@ -9,16 +9,27 @@ const PORT = process.env.PORT || 3000;
 
 // CORS configuration - Allow all origins for development/testing
 // In production, you may want to restrict this to specific origins
-app.use(cors({
+const corsOptions = {
   origin: '*', // Allow all origins
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'SOAPAction', 'Accept'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'SOAPAction', 'Accept', 'Origin', 'X-Requested-With'],
   exposedHeaders: ['Content-Type'],
-  credentials: false
-}));
+  credentials: false,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+};
 
-// Handle preflight requests
-app.options('*', cors());
+// Apply CORS to all routes
+app.use(cors(corsOptions));
+
+// Explicitly handle preflight OPTIONS requests for all routes
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key, SOAPAction, Accept, Origin, X-Requested-With');
+  res.header('Access-Control-Max-Age', '86400'); // 24 hours
+  res.sendStatus(204);
+});
 
 // Middleware to parse raw body for SOAP requests
 app.use(express.raw({ type: 'text/xml', limit: '10mb' }));
@@ -50,6 +61,11 @@ app.get('/', (req, res) => {
 
 // Catch-all for undefined routes
 app.use((req, res) => {
+  // Set CORS headers even for 404 responses
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key, SOAPAction, Accept, Origin, X-Requested-With');
+  
   res.status(404).json({ 
     error: 'Not Found', 
     path: req.path,

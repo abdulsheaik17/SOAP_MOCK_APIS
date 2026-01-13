@@ -1,5 +1,6 @@
 import { soapEnvelope } from '../utils/soap.js';
 import { parseSoapRequest } from '../utils/soapParser.js';
+import { setCorsHeaders } from '../utils/cors.js';
 
 // Mock mapping data
 const mappings = {
@@ -34,6 +35,9 @@ const mappings = {
 };
 
 export default function handler(req, res) {
+  // Set CORS headers for all responses
+  setCorsHeaders(res);
+  
   const auth = req.headers.authorization;
   
   if (auth !== "Basic YWJjOjEyMzQ=") {
