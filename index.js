@@ -1,10 +1,24 @@
 import express from 'express';
+import cors from 'cors';
 import basicAuthHandler from './api/basic_auth.js';
 import noAuthHandler from './api/no_auth.js';
 import xApiKeyHandler from './api/x_api_key.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// CORS configuration - Allow all origins for development/testing
+// In production, you may want to restrict this to specific origins
+app.use(cors({
+  origin: '*', // Allow all origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'SOAPAction', 'Accept'],
+  exposedHeaders: ['Content-Type'],
+  credentials: false
+}));
+
+// Handle preflight requests
+app.options('*', cors());
 
 // Middleware to parse raw body for SOAP requests
 app.use(express.raw({ type: 'text/xml', limit: '10mb' }));
