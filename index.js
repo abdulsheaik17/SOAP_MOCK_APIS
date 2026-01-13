@@ -19,17 +19,8 @@ const corsOptions = {
   optionsSuccessStatus: 204
 };
 
-// Apply CORS to all routes
+// Apply CORS to all routes - this will automatically handle OPTIONS preflight requests
 app.use(cors(corsOptions));
-
-// Explicitly handle preflight OPTIONS requests for all routes
-app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key, SOAPAction, Accept, Origin, X-Requested-With');
-  res.header('Access-Control-Max-Age', '86400'); // 24 hours
-  res.sendStatus(204);
-});
 
 // Middleware to parse raw body for SOAP requests
 app.use(express.raw({ type: 'text/xml', limit: '10mb' }));
